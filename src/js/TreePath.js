@@ -82,10 +82,14 @@ TreePath.prototype.setPath = function (pathObjs) {
       pathObjs.forEach(function (pathObj, idx) {
         if (idx == 0)
           return;
-        if (isNaN(parseInt(pathObj.name)))
-          path += "['" + pathObj.name + "']";
+        var name = pathObj.name;
+        if (isNaN(parseInt(name)))
+        {
+          //JSON path want's to escape commas
+          path += "['" + name.replace(',','\,') + "']";
+        }
         else
-          path += "[" + pathObj.name + "]";
+          path += "[" + name + "]";
       });
     }
     return path;
