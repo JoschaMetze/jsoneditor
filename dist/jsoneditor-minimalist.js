@@ -25,7 +25,7 @@
  *
  * @author  Jos de Jong, <wjosdejong@gmail.com>
  * @version 5.15.0
- * @date    2018-05-02
+ * @date    2018-05-15
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -137,6 +137,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *                                                                triggered on text selection change
 	 *                                                                Only applicable for modes
 	 *                                                                'text' and 'code'
+	 *                               {function} onPathCopy  Callback method, triggered on path copy. 
+	 *                                                      Only applicable for mode 'tree'
 	 * @param {Object | undefined} json JSON object
 	 */
 	function JSONEditor (container, options, json) {
@@ -175,6 +177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        'ajv', 'schema', 'schemaRefs','templates',
 	        'ace', 'theme','autocomplete',
 	        'onChange', 'onEditable', 'onError', 'onModeChange', 'onSelectionChange', 'onTextSelectionChange',
+	        'onPathCopy',
 	        'escapeUnicode', 'history', 'search', 'mode', 'modes', 'name', 'indentation', 
 	        'sortObjectKeys', 'navigationBar', 'statusBar', 'languages', 'language'
 	      ];
@@ -616,7 +619,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    schemaRefs: null,
 	    autocomplete: null,
 	    navigationBar : true,
-	    onSelectionChange: null
+	    onSelectionChange: null,
+	    onPathCopy: null,
 	  };
 
 	  // copy all options
@@ -636,6 +640,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (options.onSelectionChange) {
 	    this.onSelectionChange(options.onSelectionChange);
+	  }
+
+	  if(options.onPathCopy){
+	    this.onPathCopyHandler = options.onPathCopy;
 	  }
 
 	  setLanguages(this.options.languages);
@@ -1284,6 +1292,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.treePath = new TreePath(this.navBar);
 	    this.treePath.onSectionSelected(this._onTreePathSectionSelected.bind(this));
 	    this.treePath.onContextMenuItemSelected(this._onTreePathMenuItemSelected.bind(this));
+	    this.treePath.onPathCopied(this.onPathCopyHandler.bind(this));
 	  }
 	};
 
@@ -1981,6 +1990,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  return serializableNodes;
 	}
+
 
 	// define modes
 	module.exports = [
@@ -4772,7 +4782,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      pathEl.className = 'jsoneditor-treepath-element';
 	      pathEl.innerText = pathObj.name;
 	      pathEl.onclick = _onSegmentClick.bind(me, pathObj);
-	  
+
 	      me.path.appendChild(pathEl);
 
 	      if (pathObj.children.length) {
@@ -4796,15 +4806,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	        me.path.appendChild(sepEl, me.container);
 	      }
 
-	      if(idx === pathObjs.length - 1) {
+	      if (idx === pathObjs.length - 1) {
 	        var leftRectPos = (sepEl || pathEl).getBoundingClientRect().left;
-	        if(me.path.offsetWidth < leftRectPos) {
+	        if (me.path.offsetWidth < leftRectPos) {
 	          me.path.scrollLeft = leftRectPos;
 	        }
 	      }
 	    });
+	    var copyEl = document.createElement('div');
+	    var path = _createPath(pathObjs);
+	    copyEl.className = 'jsoneditor-treepath-copy';
+	    copyEl.setAttribute('data-clipboard-text', path);
+	    copyEl.onclick = _onCopyPathClick.bind(me, pathObjs, path);
+	    me.path.appendChild(copyEl, me.container);
 	  }
-
+	  function _createPath() {
+	    var path = "$.";
+	    if (pathObjs && pathObjs.length) {
+	      pathObjs.forEach(function (pathObj, idx) {
+	        if (idx == 0)
+	          return;
+	        var name = pathObj.name;
+	        if (isNaN(parseInt(name)))
+	        {
+	          //JSON path want's to escape commas
+	          path += "['" + name.replace(',','\,') + "']";
+	        }
+	        else
+	          path += "[" + name + "]";
+	      });
+	    }
+	    return path;
+	  }
 	  function _onSegmentClick(pathObj) {
 	    if (this.selectionCallback) {
 	      this.selectionCallback(pathObj);
@@ -4816,7 +4849,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.contextMenuCallback(pathObj, selection);
 	    }
 	  };
+
+	  function _onCopyPathClick(pathObj, path) {
+	    if (this.copyPathCallback) {
+	      this.copyPathCallback(pathObj, path);
+	    }
+	  };
 	};
+
+	/**
+	 * set a callback function for copying of path section
+	 * @param {Function} callback function to invoke when tree path is copied
+	 */
+	TreePath.prototype.onPathCopied = function (callback) {
+	  if (typeof callback === 'function') {
+	    this.copyPathCallback = callback;
+	  }
+	};
+
 
 	/**
 	 * set a callback function for selection of path section
@@ -4824,7 +4874,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	TreePath.prototype.onSectionSelected = function (callback) {
 	  if (typeof callback === 'function') {
-	    this.selectionCallback = callback;      
+	    this.selectionCallback = callback;
 	  }
 	};
 

@@ -119,7 +119,8 @@ treemode._setOptions = function (options) {
     schemaRefs: null,
     autocomplete: null,
     navigationBar : true,
-    onSelectionChange: null
+    onSelectionChange: null,
+    onPathCopy: null,
   };
 
   // copy all options
@@ -139,6 +140,10 @@ treemode._setOptions = function (options) {
 
   if (options.onSelectionChange) {
     this.onSelectionChange(options.onSelectionChange);
+  }
+
+  if(options.onPathCopy){
+    this.onPathCopyHandler = options.onPathCopy;
   }
 
   setLanguages(this.options.languages);
@@ -787,6 +792,7 @@ treemode._createFrame = function () {
     this.treePath = new TreePath(this.navBar);
     this.treePath.onSectionSelected(this._onTreePathSectionSelected.bind(this));
     this.treePath.onContextMenuItemSelected(this._onTreePathMenuItemSelected.bind(this));
+    this.treePath.onPathCopied(this.onPathCopyHandler.bind(this));
   }
 };
 
@@ -1484,6 +1490,7 @@ treemode.getNodesByRange = function (start, end) {
 
   return serializableNodes;
 }
+
 
 // define modes
 module.exports = [

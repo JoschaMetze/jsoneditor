@@ -38,7 +38,7 @@ TreePath.prototype.setPath = function (pathObjs) {
       pathEl.className = 'jsoneditor-treepath-element';
       pathEl.innerText = pathObj.name;
       pathEl.onclick = _onSegmentClick.bind(me, pathObj);
-  
+
       me.path.appendChild(pathEl);
 
       if (pathObj.children.length) {
@@ -62,15 +62,38 @@ TreePath.prototype.setPath = function (pathObjs) {
         me.path.appendChild(sepEl, me.container);
       }
 
-      if(idx === pathObjs.length - 1) {
+      if (idx === pathObjs.length - 1) {
         var leftRectPos = (sepEl || pathEl).getBoundingClientRect().left;
-        if(me.path.offsetWidth < leftRectPos) {
+        if (me.path.offsetWidth < leftRectPos) {
           me.path.scrollLeft = leftRectPos;
         }
       }
     });
+    var copyEl = document.createElement('div');
+    var path = _createPath(pathObjs);
+    copyEl.className = 'jsoneditor-treepath-copy';
+    copyEl.setAttribute('data-clipboard-text', path);
+    copyEl.onclick = _onCopyPathClick.bind(me, pathObjs, path);
+    me.path.appendChild(copyEl, me.container);
   }
-
+  function _createPath() {
+    var path = "$.";
+    if (pathObjs && pathObjs.length) {
+      pathObjs.forEach(function (pathObj, idx) {
+        if (idx == 0)
+          return;
+        var name = pathObj.name;
+        if (isNaN(parseInt(name)))
+        {
+          //JSON path want's to escape commas
+          path += "['" + name.replace(',','\,') + "']";
+        }
+        else
+          path += "[" + name + "]";
+      });
+    }
+    return path;
+  }
   function _onSegmentClick(pathObj) {
     if (this.selectionCallback) {
       this.selectionCallback(pathObj);
@@ -82,7 +105,24 @@ TreePath.prototype.setPath = function (pathObjs) {
       this.contextMenuCallback(pathObj, selection);
     }
   };
+
+  function _onCopyPathClick(pathObj, path) {
+    if (this.copyPathCallback) {
+      this.copyPathCallback(pathObj, path);
+    }
+  };
 };
+
+/**
+ * set a callback function for copying of path section
+ * @param {Function} callback function to invoke when tree path is copied
+ */
+TreePath.prototype.onPathCopied = function (callback) {
+  if (typeof callback === 'function') {
+    this.copyPathCallback = callback;
+  }
+};
+
 
 /**
  * set a callback function for selection of path section
@@ -90,7 +130,7 @@ TreePath.prototype.setPath = function (pathObjs) {
  */
 TreePath.prototype.onSectionSelected = function (callback) {
   if (typeof callback === 'function') {
-    this.selectionCallback = callback;      
+    this.selectionCallback = callback;
   }
 };
 

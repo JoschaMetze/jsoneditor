@@ -1013,6 +1013,29 @@ div.jsoneditor-treepath span.jsoneditor-treepath-seperator {
   font-family: arial, sans-serif;
 }
 
+div.jsoneditor-treepath div.jsoneditor-treepath-copy {
+  width: 16px;
+  height: 16px;
+  margin: 4px;
+  margin-right: 0px;
+  padding: 0;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  background: transparent url("img/clipboard.svg");
+  background-size: 16px;
+  background-repeat: no-repeat;
+  color: white;
+  opacity: 0.8;
+  font-family: arial, sans-serif;
+  font-size: 10pt;
+  float: right;
+}
+
+div.jsoneditor-treepath div.jsoneditor-treepath-copy:hover {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
 div.jsoneditor-treepath span.jsoneditor-treepath-element:hover,
 div.jsoneditor-treepath span.jsoneditor-treepath-seperator:hover {
   cursor: pointer;
