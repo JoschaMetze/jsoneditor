@@ -52,6 +52,8 @@ var util = require('./util');
  *                                                                triggered on text selection change
  *                                                                Only applicable for modes
  *                                                                'text' and 'code'
+ *                               {function} onPathCopy  Callback method, triggered on path copy. 
+ *                                                      Only applicable for mode 'tree'
  * @param {Object | undefined} json JSON object
  */
 function JSONEditor (container, options, json) {
@@ -90,6 +92,7 @@ function JSONEditor (container, options, json) {
         'ajv', 'schema', 'schemaRefs','templates',
         'ace', 'theme','autocomplete',
         'onChange', 'onEditable', 'onError', 'onModeChange', 'onSelectionChange', 'onTextSelectionChange',
+        'onPathCopy',
         'escapeUnicode', 'history', 'search', 'mode', 'modes', 'name', 'indentation', 
         'sortObjectKeys', 'navigationBar', 'statusBar', 'languages', 'language'
       ];

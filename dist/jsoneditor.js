@@ -137,6 +137,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *                                                                triggered on text selection change
 	 *                                                                Only applicable for modes
 	 *                                                                'text' and 'code'
+	 *                               {function} onPathCopy  Callback method, triggered on path copy. 
+	 *                                                      Only applicable for mode 'tree'
 	 * @param {Object | undefined} json JSON object
 	 */
 	function JSONEditor (container, options, json) {
@@ -175,6 +177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        'ajv', 'schema', 'schemaRefs','templates',
 	        'ace', 'theme','autocomplete',
 	        'onChange', 'onEditable', 'onError', 'onModeChange', 'onSelectionChange', 'onTextSelectionChange',
+	        'onPathCopy',
 	        'escapeUnicode', 'history', 'search', 'mode', 'modes', 'name', 'indentation', 
 	        'sortObjectKeys', 'navigationBar', 'statusBar', 'languages', 'language'
 	      ];
@@ -8174,7 +8177,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    schemaRefs: null,
 	    autocomplete: null,
 	    navigationBar : true,
-	    onSelectionChange: null
+	    onSelectionChange: null,
+	    onPathCopy: null,
 	  };
 
 	  // copy all options
@@ -8194,6 +8198,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (options.onSelectionChange) {
 	    this.onSelectionChange(options.onSelectionChange);
+	  }
+
+	  if(options.onPathCopy){
+	    this.onPathCopyHandler = options.onPathCopy;
 	  }
 
 	  setLanguages(this.options.languages);
@@ -8842,6 +8850,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.treePath = new TreePath(this.navBar);
 	    this.treePath.onSectionSelected(this._onTreePathSectionSelected.bind(this));
 	    this.treePath.onContextMenuItemSelected(this._onTreePathMenuItemSelected.bind(this));
+	    this.treePath.onPathCopied(this.onPathCopyHandler.bind(this));
 	  }
 	};
 
@@ -9539,6 +9548,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  return serializableNodes;
 	}
+
 
 	// define modes
 	module.exports = [
