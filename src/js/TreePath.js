@@ -73,7 +73,7 @@ TreePath.prototype.setPath = function (pathObjs) {
     var path = _createPath(pathObjs);
     copyEl.className = 'jsoneditor-treepath-copy';
     copyEl.setAttribute('data-clipboard-text', path);
-    copyEl.onclick = _onCopyPathClick.bind(me, pathObjs, path);
+    copyEl.onclick = _onCopyPathClick.bind(me, path);
     me.path.appendChild(copyEl, me.container);
   }
   function _createPath() {
@@ -106,9 +106,9 @@ TreePath.prototype.setPath = function (pathObjs) {
     }
   };
 
-  function _onCopyPathClick(pathObj, path) {
+  function _onCopyPathClick(path) {
     if (this.copyPathCallback) {
-      this.copyPathCallback(pathObj, path);
+      this.copyPathCallback(path);
     }
   };
 };

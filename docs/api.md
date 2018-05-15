@@ -249,6 +249,23 @@ Constructs a new JSONEditor.
 
   All available fields for translation can be found in the source file `src/js/i18n.js`.
 
+- `{function} onPathCopy`
+
+  Set a callback function triggered when the tree path should copied to the clipboard.
+  Use clipboard.js to automatically copy on click via data-clipboard-text attribute.
+
+  callback signature should be:
+  ```js
+  /**
+  * 
+  * @param {String=} path
+  * @param {SerializableNode=} end
+  */
+  function onPathCopy(path) {
+    ...
+  }
+  ```
+  Only applicable when `mode` is 'tree'.
 
 ### Methods
 

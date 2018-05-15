@@ -792,7 +792,8 @@ treemode._createFrame = function () {
     this.treePath = new TreePath(this.navBar);
     this.treePath.onSectionSelected(this._onTreePathSectionSelected.bind(this));
     this.treePath.onContextMenuItemSelected(this._onTreePathMenuItemSelected.bind(this));
-    this.treePath.onPathCopied(this.onPathCopyHandler.bind(this));
+    if(this.onPathCopyHandler)
+      this.treePath.onPathCopied(this.onPathCopyHandler.bind(this));
   }
 };
 

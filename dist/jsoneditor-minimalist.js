@@ -1292,7 +1292,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.treePath = new TreePath(this.navBar);
 	    this.treePath.onSectionSelected(this._onTreePathSectionSelected.bind(this));
 	    this.treePath.onContextMenuItemSelected(this._onTreePathMenuItemSelected.bind(this));
-	    this.treePath.onPathCopied(this.onPathCopyHandler.bind(this));
+	    if(this.onPathCopyHandler)
+	      this.treePath.onPathCopied(this.onPathCopyHandler.bind(this));
 	  }
 	};
 
@@ -4817,7 +4818,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var path = _createPath(pathObjs);
 	    copyEl.className = 'jsoneditor-treepath-copy';
 	    copyEl.setAttribute('data-clipboard-text', path);
-	    copyEl.onclick = _onCopyPathClick.bind(me, pathObjs, path);
+	    copyEl.onclick = _onCopyPathClick.bind(me, path);
 	    me.path.appendChild(copyEl, me.container);
 	  }
 	  function _createPath() {
@@ -4850,9 +4851,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  function _onCopyPathClick(pathObj, path) {
+	  function _onCopyPathClick(path) {
 	    if (this.copyPathCallback) {
-	      this.copyPathCallback(pathObj, path);
+	      this.copyPathCallback(path);
 	    }
 	  };
 	};
