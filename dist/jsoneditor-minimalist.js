@@ -4814,6 +4814,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var path = "$.";
 	    if (pathObjs && pathObjs.length) {
 	      pathObjs.forEach(function (pathObj, idx) {
+	        if (idx == 0)
+	          return;
 	        if (isNaN(parseInt(pathObj.name)))
 	          path += "['" + pathObj.name + "']";
 	        else
