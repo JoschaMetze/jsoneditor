@@ -8,13 +8,14 @@ var mkdirp = require('mkdirp');
 var webpack = require('webpack');
 var uglify = require('uglify-js');
 
-var NAME    = 'jsoneditor';
+var NAME = 'jsoneditor';
 var NAME_MINIMALIST = 'jsoneditor-minimalist';
-var ENTRY   = './src/js/JSONEditor.js';
-var HEADER  = './src/js/header.js';
-var IMAGE   = './src/css/img/jsoneditor-icons.svg';
-var DOCS    = './src/docs/*';
-var DIST    = './dist';
+var ENTRY = './src/js/JSONEditor.js';
+var HEADER = './src/js/header.js';
+var IMAGE = './src/css/img/jsoneditor-icons.svg';
+var CLIPBOARD = './src/css/img/clipboard.svg';
+var DOCS = './src/docs/*';
+var DIST = './dist';
 
 // generate banner with today's date and correct version
 function createBanner() {
@@ -22,8 +23,8 @@ function createBanner() {
   var version = require('./package.json').version;  // math.js version
 
   return String(fs.readFileSync(HEADER))
-      .replace('@@date', today)
-      .replace('@@version', version);
+    .replace('@@date', today)
+    .replace('@@version', version);
 }
 
 var bannerPlugin = new webpack.BannerPlugin(createBanner(), {
@@ -40,7 +41,7 @@ var compiler = webpack({
     path: DIST,
     filename: NAME + '.js'
   },
-  plugins: [ bannerPlugin ],
+  plugins: [bannerPlugin],
   module: {
     loaders: [
       { test: /\.json$/, loader: "json" }
@@ -140,11 +141,11 @@ gulp.task('bundle-css', ['mkdir'], function () {
     'src/css/statusbar.css',
     'src/css/navigationbar.css'
   ])
-      .pipe(concatCss(NAME + '.css'))
-      .pipe(gulp.dest(DIST))
-      .pipe(concatCss(NAME + '.min.css'))
-      .pipe(minifyCSS())
-      .pipe(gulp.dest(DIST));
+    .pipe(concatCss(NAME + '.css'))
+    .pipe(gulp.dest(DIST))
+    .pipe(concatCss(NAME + '.min.css'))
+    .pipe(minifyCSS())
+    .pipe(gulp.dest(DIST));
 
   gutil.log('bundled ' + DIST + '/' + NAME + '.css');
   gutil.log('bundled ' + DIST + '/' + NAME + '.min.css');
@@ -152,15 +153,15 @@ gulp.task('bundle-css', ['mkdir'], function () {
 
 // create a folder img and copy the icons
 gulp.task('copy-img', ['mkdir'], function () {
-  gulp.src(IMAGE)
-      .pipe(gulp.dest(DIST + '/img'));
+  gulp.src([IMAGE, CLIPBOARD])
+    .pipe(gulp.dest(DIST + '/img'));
   gutil.log('Copied images');
 });
 
 // create a folder img and copy the icons
 gulp.task('copy-docs', ['mkdir'], function () {
   gulp.src(DOCS)
-      .pipe(gulp.dest(DIST));
+    .pipe(gulp.dest(DIST));
   gutil.log('Copied doc');
 });
 
@@ -175,7 +176,7 @@ gulp.task('minify-minimalist', ['bundle-minimalist'], function () {
 // TODO: zip file using archiver
 var pkg = 'jsoneditor-' + require('./package.json').version + '.zip';
 gulp.task('zip', shell.task([
-      'zip ' + pkg + ' ' + 'README.md NOTICE LICENSE HISTORY.md index.html src dist docs examples -r '
+  'zip ' + pkg + ' ' + 'README.md NOTICE LICENSE HISTORY.md index.html src dist docs examples -r '
 ]));
 
 // The watch task (to automatically rebuild when the source code changes)

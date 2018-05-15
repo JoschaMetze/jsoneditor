@@ -25,7 +25,7 @@
  *
  * @author  Jos de Jong, <wjosdejong@gmail.com>
  * @version 5.15.0
- * @date    2018-05-02
+ * @date    2018-05-15
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -3098,41 +3098,53 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	var isArray = Array.isArray;
+	var keyList = Object.keys;
+	var hasProp = Object.prototype.hasOwnProperty;
+
 	module.exports = function equal(a, b) {
 	  if (a === b) return true;
 
-	  var arrA = Array.isArray(a)
-	    , arrB = Array.isArray(b)
-	    , i;
+	  var arrA = isArray(a)
+	    , arrB = isArray(b)
+	    , i
+	    , length
+	    , key;
 
 	  if (arrA && arrB) {
-	    if (a.length != b.length) return false;
-	    for (i = 0; i < a.length; i++)
+	    length = a.length;
+	    if (length != b.length) return false;
+	    for (i = 0; i < length; i++)
 	      if (!equal(a[i], b[i])) return false;
 	    return true;
 	  }
 
 	  if (arrA != arrB) return false;
 
-	  if (a && b && typeof a === 'object' && typeof b === 'object') {
-	    var keys = Object.keys(a);
-	    if (keys.length !== Object.keys(b).length) return false;
+	  var dateA = a instanceof Date
+	    , dateB = b instanceof Date;
+	  if (dateA != dateB) return false;
+	  if (dateA && dateB) return a.getTime() == b.getTime();
 
-	    var dateA = a instanceof Date
-	      , dateB = b instanceof Date;
-	    if (dateA && dateB) return a.getTime() == b.getTime();
-	    if (dateA != dateB) return false;
+	  var regexpA = a instanceof RegExp
+	    , regexpB = b instanceof RegExp;
+	  if (regexpA != regexpB) return false;
+	  if (regexpA && regexpB) return a.toString() == b.toString();
 
-	    var regexpA = a instanceof RegExp
-	      , regexpB = b instanceof RegExp;
-	    if (regexpA && regexpB) return a.toString() == b.toString();
-	    if (regexpA != regexpB) return false;
+	  if (a instanceof Object && b instanceof Object) {
+	    var keys = keyList(a);
+	    length = keys.length;
 
-	    for (i = 0; i < keys.length; i++)
-	      if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+	    if (length !== keyList(b).length)
+	      return false;
 
-	    for (i = 0; i < keys.length; i++)
-	      if(!equal(a[keys[i]], b[keys[i]])) return false;
+	    for (i = 0; i < length; i++)
+	      if (!hasProp.call(b, keys[i])) return false;
+
+	    for (i = 0; i < length; i++) {
+	      key = keys[i];
+	      if (!equal(a[key], b[key])) return false;
+	    }
 
 	    return true;
 	  }
@@ -12318,7 +12330,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      pathEl.className = 'jsoneditor-treepath-element';
 	      pathEl.innerText = pathObj.name;
 	      pathEl.onclick = _onSegmentClick.bind(me, pathObj);
-	  
+
 	      me.path.appendChild(pathEl);
 
 	      if (pathObj.children.length) {
@@ -12342,15 +12354,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	        me.path.appendChild(sepEl, me.container);
 	      }
 
-	      if(idx === pathObjs.length - 1) {
+	      if (idx === pathObjs.length - 1) {
 	        var leftRectPos = (sepEl || pathEl).getBoundingClientRect().left;
-	        if(me.path.offsetWidth < leftRectPos) {
+	        if (me.path.offsetWidth < leftRectPos) {
 	          me.path.scrollLeft = leftRectPos;
 	        }
 	      }
 	    });
+	    var copyEl = document.createElement('div');
+	    var path = _createPath(pathObjs);
+	    copyEl.className = 'jsoneditor-treepath-copy';
+	    copyEl.setAttribute('data-clipboard-text', path);
+	    copyEl.onclick = _onCopyPathClick.bind(me, pathObjs, path);
+	    me.path.appendChild(copyEl, me.container);
 	  }
-
+	  function _createPath() {
+	    var path = "$.";
+	    if (pathObjs && pathObjs.length) {
+	      pathObjs.forEach(function (pathObj, idx) {
+	        if (isNaN(parseInt(pathObj.name)))
+	          path += "['" + pathObj.name + "']";
+	        else
+	          path += "[" + pathObj.name + "]";
+	      });
+	    }
+	    return path;
+	  }
 	  function _onSegmentClick(pathObj) {
 	    if (this.selectionCallback) {
 	      this.selectionCallback(pathObj);
@@ -12362,7 +12391,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.contextMenuCallback(pathObj, selection);
 	    }
 	  };
+
+	  function _onCopyPathClick(pathObj, path) {
+	    if (this.copyPathCallback) {
+	      this.copyPathCallback(pathObj, path);
+	    }
+	  };
 	};
+
+	/**
+	 * set a callback function for copying of path section
+	 * @param {Function} callback function to invoke when tree path is copied
+	 */
+	TreePath.prototype.onPathCopied = function (callback) {
+	  if (typeof callback === 'function') {
+	    this.copyPathCallback = callback;
+	  }
+	};
+
 
 	/**
 	 * set a callback function for selection of path section
@@ -12370,7 +12416,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	TreePath.prototype.onSectionSelected = function (callback) {
 	  if (typeof callback === 'function') {
-	    this.selectionCallback = callback;      
+	    this.selectionCallback = callback;
 	  }
 	};
 
