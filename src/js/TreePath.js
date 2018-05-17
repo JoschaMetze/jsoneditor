@@ -89,11 +89,9 @@ TreePath.prototype.setPath = function (pathObjs) {
           path += "['" + name.replace(',', '\,') + "']";
         }
         else
-          path += "[" + name + "].";
+          path += "[" + name + "]";
       });
     }
-    if (path.endsWith('.'))
-      path = path.substring(0, path.length - 1);
     return path;
   }
   function _onSegmentClick(pathObj) {
