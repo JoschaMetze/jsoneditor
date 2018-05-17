@@ -4829,14 +4829,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return;
 	        var name = pathObj.name;
 	        if (isNaN(parseInt(name))) {
-	          path += '.';
+
 	          //JSON path want's to escape commas
 	          path += "['" + name.replace(',', '\,') + "']";
 	        }
 	        else
-	          path += "[" + name + "]";
+	          path += "[" + name + "].";
 	      });
 	    }
+	    if (path.endsWith('.'))
+	      path = path.substring(0, path.length - 1);
 	    return path;
 	  }
 	  function _onSegmentClick(pathObj) {
