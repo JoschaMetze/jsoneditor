@@ -25,7 +25,7 @@
  *
  * @author  Jos de Jong, <wjosdejong@gmail.com>
  * @version 5.15.0
- * @date    2018-05-15
+ * @date    2018-05-17
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -12380,16 +12380,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    me.path.appendChild(copyEl, me.container);
 	  }
 	  function _createPath() {
-	    var path = "$.";
+	    var path = "$";
 	    if (pathObjs && pathObjs.length) {
 	      pathObjs.forEach(function (pathObj, idx) {
 	        if (idx == 0)
 	          return;
 	        var name = pathObj.name;
-	        if (isNaN(parseInt(name)))
-	        {
+	        if (isNaN(parseInt(name))) {
+	          path += '.';
 	          //JSON path want's to escape commas
-	          path += "['" + name.replace(',','\,') + "']";
+	          path += "['" + name.replace(',', '\,') + "']";
 	        }
 	        else
 	          path += "[" + name + "]";
